@@ -1,0 +1,9 @@
+{
+    "protoc": {
+        "path": "D:/Tools/protoc-28.0-rc-2-win64/bin/protoc.exe",
+        "options": [
+            "--proto_path=D:/Tools/protoc-28.0-rc-2-win64/include",
+            "--proto_path=proto",
+        ]
+    }
+}

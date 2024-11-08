@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package user;
+
+import "basic.proto";
+import "google/protobuf/wrappers.proto";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (UserInfo);
+    rpc UpdateUser(UpdateUserRequest) returns (UserInfo);
+    rpc DeleteUser(DeleteUserRequest) returns (UserInfo);
+    rpc GetUser(GetUserRequest) returns (UserInfo);
+    rpc ListUser(ListUserRequest) returns (ListUserResponse);
+}
+
+message CreateUserRequest {
+    
+}
+
+message UserInfo{}
+
+message UpdateUserRequest {
+    int32 id = 1;
+}
+
+message DeleteUserRequest {
+    int32 id = 1;   
+}
+
+message GetUserRequest {
+    int32 id = 1;
+}
+
+message ListUserRequest {
+    basic.Page page = 1;
+    
+    google.protobuf.StringValue keyword = 2;
+    
+    basic.TimeRange range = 6;
+}
+
+message ListUserResponse {
+    repeated UserInfo data = 1;
+    basic.Page page = 2;
+}

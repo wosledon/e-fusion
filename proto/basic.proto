@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package basic;
+
+import "google/protobuf/timestamp.proto";
+
+message Page {
+    int32 page = 1;
+    int32 size = 2;
+}
+
+// 时间区间
+message TimeRange {
+    google.protobuf.Timestamp start_time = 1;
+    google.protobuf.Timestamp end_time = 2;
+}

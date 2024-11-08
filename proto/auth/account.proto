@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package account;
+
+import "basic.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+service AccountService {
+    rpc CreateAccount(CreateAccountRequest) returns (AccountInfo);
+    rpc UpdateAccount(UpdateAccountRequest) returns (AccountInfo);
+    rpc DeleteAccount(DeleteAccountRequest) returns (AccountInfo);
+    rpc GetAccount(GetAccountRequest) returns (AccountInfo);
+    rpc ListAccount(ListAccountRequest) returns (ListAccountResponse);
+}
+
+message CreateAccountRequest {
+    string name = 1;
+    string username = 2;
+    string password = 3;
+    string email = 4;
+}
+
+message CreateAccountResponse {
+    int32 id = 1;
+}
+
+message UpdateAccountRequest {
+    int32 id = 1;
+    string name = 2;
+    string username = 3;
+    string password = 4;
+    string email = 5;
+}
+
+
+message DeleteAccountRequest {
+    int32 id = 1;
+}
+
+message GetAccountRequest {
+    int32 id = 1;
+}
+
+message ListAccountRequest {
+    basic.Page page = 1;
+
+    google.protobuf.StringValue keyword = 2;
+    AccountStatusEnum status = 5;
+    
+    basic.TimeRange range = 6;
+}
+
+message AccountInfo {
+    int32 id = 1;
+    string name = 2;
+    string username = 3;
+    string email = 4;
+    string status = 5;
+    google.protobuf.Timestamp created_at = 6;
+    google.protobuf.Timestamp updated_at = 7;
+}
+
+message ListAccountResponse {
+    int32 total = 1;
+    repeated AccountInfo data = 2;
+}
+
+enum AccountStatusEnum {
+    AccountStatusEnum_ACTIVE = 0;
+    AccountStatusEnum_INACTIVE = 1;
+    AccountStatusEnum_DELETED = 2;
+}

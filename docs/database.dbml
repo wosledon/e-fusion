@@ -1,54 +1,118 @@
-Table users {
-  id int [pk, increment, note: "用户ID，主键，自增"] // 用户ID，主键，自增
-  username varchar(50) [unique, not null, note: "用户名，唯一，不为空"] // 用户名，唯一，不为空
-  password varchar(255) [not null, note: "密码，不为空"] // 密码，不为空
-  email varchar(100) [unique, not null, note: "邮箱，唯一，不为空"] // 邮箱，唯一，不为空
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// Auth Center:
+
+Table account{
+    id int [pk, increment, note: "账号Id"]
+    name varchar(255) [not null, note: "名称"]
+    username varchar(255) [not null, note: "账号"]
+    password varchar(255) [not null, note: "密码"]
+    email varchar(255) [not null, note: "邮箱"]
+    status int [default: 0, note: "账号状态"]
+    created_at datetime [default: `CURRENT_TIMESTAMP`, note: "创建时间"]
+    updated_at datetime [default: `CURRENT_TIMESTAMP`, note: "更新时间"]
 }
 
-Table articles {
-  id int [pk, increment, note: "文章ID，主键，自增"] // 文章ID，主键，自增
-  title varchar(255) [not null, note: "标题，不为空"] // 标题，不为空
-  content text [not null, note: "内容，不为空"] // 内容，不为空
-  author_id int [not null, ref: > users.id, note: "作者ID，外键引用 users 表的 id"] // 作者ID，外键引用 users 表的 id
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+Table user {
+    id int [pk, increment, note: "用户Id"]
+    name varchar(255) [not null, note: "用户名"]
+    email varchar(255) [not null, note: "邮箱"]
+    account_id int [not null, note: "账号Id"]
+    last_login datetime [note: "最后登录时间"]
+    created_at datetime [default: `CURRENT_TIMESTAMP`, note: "创建时间"]
+    updated_at datetime [default: `CURRENT_TIMESTAMP`, note: "更新时间"]
 }
 
-Table comments {
-  id int [pk, increment, note: "评论ID，主键，自增"] // 评论ID，主键，自增
-  article_id int [not null, ref: > articles.id, note: "文章ID，外键引用 articles 表的 id"] // 文章ID，外键引用 articles 表的 id
-  user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
-  content text [not null, note: "评论内容，不为空"] // 评论内容，不为空
-  parent_comment_id int [note: "被引用的评论ID，允许为空"] // 被引用的评论ID，允许为空
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+ref: account.id > user.account_id
+
+Table role {
+    id int [pk, increment, note: "角色Id"]
+    name varchar(255) [not null, note: "角色名"]
+    created_at datetime [default: `CURRENT_TIMESTAMP`, note: "创建时间"]
+    updated_at datetime [default: `CURRENT_TIMESTAMP`, note: "更新时间"]
 }
 
-Table notifications {
-  id int [pk, increment, note: "通知ID，主键，自增"] // 通知ID，主键，自增
-  user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
-  message text [not null, note: "消息内容，不为空"] // 消息内容，不为空
-  read boolean [default: false, note: "是否已读，默认未读"] // 是否已读，默认未读
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+Table permission {
+    id int [pk, increment, note: "权限Id"]
+    name varchar(255) [not null, note: "权限名"]
+    url varchar(255) [not null, note: "权限路径"]
+    method varchar(255) [not null, note: "请求方法"]
+    created_at datetime [default: `CURRENT_TIMESTAMP`, note: "创建时间"]
+    updated_at datetime [default: `CURRENT_TIMESTAMP`, note: "更新时间"]
 }
 
-Table search_index {
-  id int [pk, increment, note: "索引ID，主键，自增"] // 索引ID，主键，自增
-  article_id int [not null, ref: > articles.id, note: "文章ID，外键引用 articles 表的 id"] // 文章ID，外键引用 articles 表的 id
-  content text [not null, note: "索引内容，不为空"] // 索引内容，不为空
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+Table user_role {
+    id int [pk, increment, note: "用户角色Id"]
+    user_id int [not null, note: "用户Id"]
+    role_id int [not null, note: "角色Id"]
+    created_at datetime [default: `CURRENT_TIMESTAMP`, note: "创建时间"]
+    updated_at datetime [default: `CURRENT_TIMESTAMP`, note: "更新时间"]
 }
 
-Table files {
-  id int [pk, increment, note: "文件ID，主键，自增"] // 文件ID，主键，自增
-  filename varchar(255) [not null, note: "文件名，不为空"] // 文件名，不为空
-  filepath varchar(255) [not null, note: "文件路径，不为空"] // 文件路径，不为空
-  user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+ref: user.id > user_role.user_id
+ref: role.id > user_role.role_id
+
+Table role_permission {
+    id int [pk, increment, note: "角色权限Id"]
+    role_id int [not null, note: "角色Id"]
+    permission_id int [not null, note: "权限Id"]
+    created_at datetime [default: `CURRENT_TIMESTAMP`, note: "创建时间"]
+    updated_at datetime [default: `CURRENT_TIMESTAMP`, note: "更新时间"]
 }
 
-Table analytics {
-  id int [pk, increment, note: "分析ID，主键，自增"] // 分析ID，主键，自增
-  user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
-  action varchar(255) [not null, note: "操作类型，不为空"] // 操作类型，不为空
-  created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
-}
+ref: role.id > role_permission.role_id
+ref: permission.id > role_permission.permission_id
+
+
+// Table users {
+//   id int [pk, increment, note: "用户ID，主键，自增"] // 用户ID，主键，自增
+//   username varchar(50) [unique, not null, note: "用户名，唯一，不为空"] // 用户名，唯一，不为空
+//   password varchar(255) [not null, note: "密码，不为空"] // 密码，不为空
+//   email varchar(100) [unique, not null, note: "邮箱，唯一，不为空"] // 邮箱，唯一，不为空
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
+
+// Table articles {
+//   id int [pk, increment, note: "文章ID，主键，自增"] // 文章ID，主键，自增
+//   title varchar(255) [not null, note: "标题，不为空"] // 标题，不为空
+//   content text [not null, note: "内容，不为空"] // 内容，不为空
+//   author_id int [not null, ref: > users.id, note: "作者ID，外键引用 users 表的 id"] // 作者ID，外键引用 users 表的 id
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
+
+// Table comments {
+//   id int [pk, increment, note: "评论ID，主键，自增"] // 评论ID，主键，自增
+//   article_id int [not null, ref: > articles.id, note: "文章ID，外键引用 articles 表的 id"] // 文章ID，外键引用 articles 表的 id
+//   user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
+//   content text [not null, note: "评论内容，不为空"] // 评论内容，不为空
+//   parent_comment_id int [note: "被引用的评论ID，允许为空"] // 被引用的评论ID，允许为空
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
+
+// Table notifications {
+//   id int [pk, increment, note: "通知ID，主键，自增"] // 通知ID，主键，自增
+//   user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
+//   message text [not null, note: "消息内容，不为空"] // 消息内容，不为空
+//   read boolean [default: false, note: "是否已读，默认未读"] // 是否已读，默认未读
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
+
+// Table search_index {
+//   id int [pk, increment, note: "索引ID，主键，自增"] // 索引ID，主键，自增
+//   article_id int [not null, ref: > articles.id, note: "文章ID，外键引用 articles 表的 id"] // 文章ID，外键引用 articles 表的 id
+//   content text [not null, note: "索引内容，不为空"] // 索引内容，不为空
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
+
+// Table files {
+//   id int [pk, increment, note: "文件ID，主键，自增"] // 文件ID，主键，自增
+//   filename varchar(255) [not null, note: "文件名，不为空"] // 文件名，不为空
+//   filepath varchar(255) [not null, note: "文件路径，不为空"] // 文件路径，不为空
+//   user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
+
+// Table analytics {
+//   id int [pk, increment, note: "分析ID，主键，自增"] // 分析ID，主键，自增
+//   user_id int [not null, ref: > users.id, note: "用户ID，外键引用 users 表的 id"] // 用户ID，外键引用 users 表的 id
+//   action varchar(255) [not null, note: "操作类型，不为空"] // 操作类型，不为空
+//   created_at timestamp [default: `current_timestamp`, note: "创建时间，默认当前时间"] // 创建时间，默认当前时间
+// }
